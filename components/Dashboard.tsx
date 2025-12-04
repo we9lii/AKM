@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { User, UploadedFile } from '../types';
-import { UploadCloud, File as FileIcon, Image as ImageIcon, Film, X, ShieldCheck, LogOut, Wifi, AlertCircle, Loader2 } from 'lucide-react';
+import { UploadCloud, File as FileIcon, Image as ImageIcon, Film, X, ShieldCheck, LogOut, Wifi, AlertCircle, Loader2, Download } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 // ==========================================
@@ -140,6 +140,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+  };
+
+  const downloadFile = async (file: UploadedFile) => {
+    const url = file.secureUrl || file.previewUrl;
+    if (!url) return;
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = file.name || 'download';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(objectUrl);
+      fetch(`${BACKEND_URL}/api/monitor/heartbeat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: user.username,
+          userId: user.email,
+          action: `DOWNLOADED_FILE: ${file.name}`,
+          platform: navigator.platform
+        })
+      }).catch(() => {});
+    } catch (err) {
+      console.error('Download Error:', err);
+    }
   };
 
   const uploadFileToCloudinary = (file: File, tempId: string) => {
@@ -418,6 +447,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
                     title="Delete Permanently"
                 >
                     <X className="w-4 h-4" />
+                </button>
+                <button 
+                    onClick={() => downloadFile(file)}
+                    className="p-1.5 rounded-full bg-gray-700/80 text-gray-400 opacity-0 group-hover:opacity-100 hover:bg-indigo-500/20 hover:text-indigo-400 transition-all backdrop-blur-sm"
+                    title="Download"
+                >
+                    <Download className="w-4 h-4" />
                 </button>
               </div>
 
