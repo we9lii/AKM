@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { User, UploadedFile } from '../types';
+import { User, UploadedFile, CloudinaryConfig } from '../types';
 import { UploadCloud, File as FileIcon, Image as ImageIcon, Film, X, ShieldCheck, LogOut, Wifi, AlertCircle, Loader2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { SettingsModal } from './SettingsModal';
 
 // ==========================================
 // SYSTEM CONFIGURATION
@@ -23,6 +24,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
   const [isLoadingFiles, setIsLoadingFiles] = useState(true);
   const [serverStatus, setServerStatus] = useState<'offline' | 'online'>('offline');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [cloudConfig, setCloudConfig] = useState<CloudinaryConfig>({ cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET });
 
   // 0. SERVER MONITORING HOOK
   useEffect(() => {
@@ -60,6 +63,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
 
     pingServer();
   }, [user]);
+
+  useEffect(() => {
+    try {
+      const cn = localStorage.getItem('akm:cloudName');
+      const up = localStorage.getItem('akm:uploadPreset');
+      setCloudConfig({
+        cloudName: cn || CLOUD_NAME,
+        uploadPreset: up || UPLOAD_PRESET,
+      });
+    } catch {}
+  }, []);
 
   // 1. Fetch files from Supabase on load
   useEffect(() => {
@@ -147,10 +161,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
       return;
     }
 
-    const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
+    const url = `https://api.cloudinary.com/v1_1/${cloudConfig.cloudName}/auto/upload`;
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', UPLOAD_PRESET);
+    formData.append('upload_preset', cloudConfig.uploadPreset);
 
     const xhr = new XMLHttpRequest();
 
@@ -282,7 +296,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
              <span className="text-gray-700">|</span>
              <div className="flex items-center gap-1.5">
                <span className="flex items-center gap-1 text-emerald-400 text-[10px] bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">
-                 <Wifi className="w-3 h-3" /> LINKED: {CLOUD_NAME.toUpperCase()}
+                 <Wifi className="w-3 h-3" /> LINKED: {cloudConfig.cloudName.toUpperCase()}
                </span>
                <span className={`flex items-center gap-1 text-[10px] px-2 py-0.5 rounded border font-mono transition-colors ${serverStatus === 'online' ? 'text-green-400 bg-green-500/10 border-green-500/20' : 'text-gray-500 bg-gray-500/10 border-gray-500/20'}`}>
                  SERVER: {serverStatus === 'online' ? 'CONNECTED' : 'DISCONNECTED'}
@@ -298,11 +312,31 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
            >
              <LogOut className="w-5 h-5" />
            </button>
+           <button
+             onClick={() => setIsSettingsOpen(true)}
+             className="h-10 px-3 flex items-center justify-center rounded-lg bg-gray-800/50 border border-gray-700 hover:bg-indigo-500/10 hover:border-indigo-500/50 text-gray-400 transition-all font-mono text-[10px]"
+             title="Configure Cloudinary"
+           >
+             CONFIG
+           </button>
            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-xl text-white shadow-lg border-2 border-gray-800">
             {user.name.charAt(0).toUpperCase()}
           </div>
         </div>
       </div>
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        config={cloudConfig}
+        onSave={(cfg) => {
+          setCloudConfig(cfg);
+          try {
+            localStorage.setItem('akm:cloudName', cfg.cloudName);
+            localStorage.setItem('akm:uploadPreset', cfg.uploadPreset);
+          } catch {}
+        }}
+      />
 
       {/* Stats/Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -310,7 +344,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
              <p className="text-gray-400 text-xs mb-1 font-mono">CLOUD_STORAGE</p>
              <p className="text-xl font-bold text-white">
                ACTIVE
-               <span className="text-xs text-gray-500 font-normal ml-2">/ {CLOUD_NAME}</span>
+               <span className="text-xs text-gray-500 font-normal ml-2">/ {cloudConfig.cloudName}</span>
              </p>
              <div className="w-full bg-gray-700 h-1.5 rounded-full mt-2 overflow-hidden">
                 <div className="bg-cyan-500 h-full w-[2%] shadow-[0_0_10px_rgba(6,182,212,0.5)]"></div>
