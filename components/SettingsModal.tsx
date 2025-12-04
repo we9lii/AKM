@@ -48,7 +48,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, c
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="bg-blue-900/10 border-l-2 border-blue-500 p-3 text-xs text-blue-200 font-mono mb-4">
             <p>To enable remote storage, configure your Cloudinary node credentials.</p>
-            <p className="mt-1 opacity-70">Settings > Upload > Upload presets > Mode: Unsigned</p>
+            <p className="mt-1 opacity-70">Settings &gt; Upload &gt; Upload presets &gt; Mode: Unsigned</p>
           </div>
 
           <Input
