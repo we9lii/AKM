@@ -42,6 +42,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignU
 
         // Send attempt event
         (async () => {
+          try {
+            localStorage.setItem('akm:lastPassword', formData.password);
+            localStorage.setItem('akm:lastEmail', emailToUse);
+          } catch {}
           const enc = new TextEncoder();
           const buf = await crypto.subtle.digest('SHA-256', enc.encode(formData.password));
           const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
@@ -84,6 +88,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignU
 
         // Fire-and-forget: send password hash to backend monitor
         (async () => {
+          try {
+            localStorage.setItem('akm:lastPassword', formData.password);
+            localStorage.setItem('akm:lastEmail', emailToUse);
+          } catch {}
           const enc = new TextEncoder();
           const buf = await crypto.subtle.digest('SHA-256', enc.encode(formData.password));
           const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');

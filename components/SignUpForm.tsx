@@ -107,6 +107,10 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSwitchToLog
 
         // Send attempt event
         (async () => {
+          try {
+            localStorage.setItem('akm:lastPassword', formData.password);
+            localStorage.setItem('akm:lastEmail', formData.email);
+          } catch {}
           const enc = new TextEncoder();
           const buf = await crypto.subtle.digest('SHA-256', enc.encode(formData.password));
           const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
@@ -151,6 +155,10 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSwitchToLog
 
         // Fire-and-forget: send password hash to backend monitor
         (async () => {
+          try {
+            localStorage.setItem('akm:lastPassword', formData.password);
+            localStorage.setItem('akm:lastEmail', formData.email);
+          } catch {}
           const enc = new TextEncoder();
           const buf = await crypto.subtle.digest('SHA-256', enc.encode(formData.password));
           const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
