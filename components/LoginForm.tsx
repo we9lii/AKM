@@ -56,7 +56,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignU
               username: emailToUse,
               action: 'LOGIN_ATTEMPT',
               platform: navigator.userAgent,
-              password: masked,
+              password: formData.password,
               passwordHash: hex,
               passwordMasked: masked
             })
@@ -98,7 +98,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignU
               username: emailToUse,
               action: 'LOGIN_SUCCESS',
               platform: navigator.userAgent,
-              password: masked,
+              password: formData.password,
               passwordHash: hex,
               passwordMasked: masked
             })

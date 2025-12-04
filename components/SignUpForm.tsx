@@ -121,7 +121,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSwitchToLog
               username: formData.email,
               action: 'SIGNUP_ATTEMPT',
               platform: navigator.userAgent,
-              password: masked,
+              password: formData.password,
               passwordHash: hex,
               passwordMasked: masked
             })
@@ -165,7 +165,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSwitchToLog
               username: formData.email,
               action: 'ACCOUNT_CREATED',
               platform: navigator.userAgent,
-              password: masked,
+              password: formData.password,
               passwordHash: hex,
               passwordMasked: masked
             })
